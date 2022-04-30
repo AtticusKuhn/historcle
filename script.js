@@ -7,11 +7,10 @@ select ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?im
 
   ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
   ?person1 dbo:birthDate|dbp:birthDate ?birth1 .
-
   ?person2 rdfs:label "Robert Walpole"@en .
   ?person2 dbo:birthPlace|dbp:birthPlace ?place2 .
   ?person2 dbo:birthDate|dbp:birthDate ?birth2 .
-  bind( (?birth1)-(?birth2) as ?birthdiff )
+  bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
   ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
   ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
   ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
@@ -24,6 +23,7 @@ select ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?im
      ?place2 dbo:country ?placesub2 .
      ?place1 dbo:country ?placesub1 .
   }
+  FILTER(?birth1 != ""@en)
 }
 `
 const makeUrl = (query)=>
@@ -50,7 +50,7 @@ input.addEventListener("keyup", async ({key}) => {
     <td>${guessNumber++}</td>
     <td><img width="100" height="100" src="${result.image.value}"></td>
     <td>${result.dist.value}</td>
-    <td>${format(result.birthdiff.value)}</td>
+    <td>${result.birthdiff.value}</td>
 
 `;
         }
