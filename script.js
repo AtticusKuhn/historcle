@@ -44,7 +44,10 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
     OPTIONAL{
     ?person1 rdf:type ?common .
     ?person2 rdf:type ?common .
-    ?common rdfs:subClassOf* yago:Person100007846 .
+   { ?common rdfs:subClassOf* yago:Person100007846 .}
+   UNION
+   { ?common rdfs:subClassOf* dbo:Person .}
+
     }
      MINUS {
        ?person1 dbo:birthPlace ?placesub1 .
@@ -56,6 +59,8 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
     }
     FILTER(?birth1 != ""@en)
     FILTER(datatype(?birth1) != xsd:gMonthDay)
+
+
   }
   GROUP BY ?common
   LIMIT 4
@@ -72,7 +77,7 @@ const flat = (results) => results.reduce((acc, curr) => {
             acc[key] = curr[key]
         }
     }
-    if (curr.common.value) {
+    if (curr?.common?.value) {
         acc.common.push(curr.common.value)
     }
     return acc
@@ -105,8 +110,9 @@ const request = async (guess) => {
         const result = flat(json["results"]["bindings"]);
         console.log(result)
         return result;
-    } catch {
-        alert("I had an errro")
+    } catch (e) {
+        alert("I had an error")
+        console.error(e)
     }
 
 }
