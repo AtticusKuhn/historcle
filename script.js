@@ -1,19 +1,37 @@
 const table = document.getElementById("table")
 const input = document.getElementById("input")
+const day = document.getElementById("day")
+
 let guessNumber = 0
-// const selectPersonQuery = () => `
-// `
-const secretPerson = "Richard Nixon"
+const startDate = new Date(`May 1 2022`)
+const now = new Date();
+const numberOfDays = Math.floor((now.getTime() - startDate.getTime()) / 86400000);
+day.innerText = numberOfDays.toString();
+const secretPerson = people[numberOfDays]//"Richard Nixon"
+console.log("the secret person is", secretPerson)
 const keys = ["birthdiff", "dist"]
+/* I used this query to generate the people
+SELECT ?p (<LONG::IRI_RANK>(?p) as ?v) 
+WHERE { 
+  ?p a foaf:Person . 
+  ?p dbp:birthPlace ?place .
+  ?p dbp:birthDate ?birth .
+  ?place <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point .
+  FILTER ( datatype(?birth) = xsd:date) 
+} 
+GROUP BY ?p 
+ORDER BY DESC(?v)
+LIMIT 400
+*/
 const makeQuery = (guess) => `
 SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common where { 
+    VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
     ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
     ?person1 dbo:birthDate|dbp:birthDate ?birth1 .
-    ?person2 rdfs:label "${secretPerson}"@en .
-    ?person2 dbo:birthPlace|dbp:birthPlace ?place2 .
-    ?person2 dbo:birthDate|dbp:birthDate ?birth2 .
+    ?person2 dbp:birthPlace ?place2 .
+    ?person2 dbp:birthDate ?birth2 .
    
     bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
   
@@ -26,7 +44,7 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
     OPTIONAL{
     ?person1 rdf:type ?common .
     ?person2 rdf:type ?common .
-    ?common rdfs:subClassOf* yago:Person100007846 
+    ?common rdfs:subClassOf* yago:Person100007846 .
     }
      MINUS {
        ?person1 dbo:birthPlace ?placesub1 .
@@ -37,6 +55,7 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
        ?place1 dbo:country ?placesub1 .
     }
     FILTER(?birth1 != ""@en)
+    FILTER(datatype(?birth1) != xsd:gMonthDay)
   }
   GROUP BY ?common
   LIMIT 4
