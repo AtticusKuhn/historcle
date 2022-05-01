@@ -62,8 +62,8 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
 
 `
 const makeUrl = (query) =>
-    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(makeQuery(query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
-const fmt = (stuff) => stuff.split("/")[stuff.split("/").length - 1].replace(/\d/g, "")
+    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent((query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
+const fmt = (stuff) => stuff.split("/")[stuff.split("/").length - 1].replace(/\d/g, "").replace(/[A-Z]/g, letter => ` ${letter}`)
 const flat = (results) => results.reduce((acc, curr) => {
     console.log("curr", curr)
     for (const key of keys) {
@@ -79,8 +79,24 @@ const flat = (results) => results.reduce((acc, curr) => {
 }, Object.assign(results[0], { common: [] })
 )
 
+const matches = async (guess, person) => {
+    const q = `
+    SELECT * WHERE {
+        values ?person {
+        <${person}>
+        }
+           ?person rdfs:label "${guess}"@en .
+        
+        }
+    `
+    const url = makeUrl(q);
+    const req = await fetch(url);
+    const json = await req.json();
+    return json.results.bindings.length > 0;
+}
+
 const request = async (guess) => {
-    const url = makeUrl(guess);
+    const url = makeUrl(makeQuery(guess));
     const req = await fetch(url);
     const json = await req.json();
     console.log(json)
@@ -103,7 +119,7 @@ input.addEventListener("keyup", async ({ key }) => {
             return;
         }
         waiting = true
-        if (value === secretPerson) {
+        if (await matches(value, secretPerson)) {
             alert("you win!")
             waiting = false
             return;
