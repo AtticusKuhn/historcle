@@ -4,21 +4,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>replit</title>
+  <title>Historcle</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
+  <div id="main">
+    <h1>Historcle: A History Guessing Game</h1>
+    <p>I have thought of a secret historical figure. Can you guess him? For each guess I will tell you
+      how many years apart the two figures were born, and how far away they were born.
+      Please note that as I am pulling these figures from <a href="https://en.wikipedia.org/">Wikipedia</a>,you must be
+      precise
+      in your spelling, i.e. "LeBron James" matches but not "Lebron James".
+    </p>
     <table id="table">
-  <tr>
-    <th>Guess Number</th>
-    <th>Guess Image</th>
-    <th>Distance (km)</th>
-    <th>Time (years)</th>
-  </tr>
+      <tr>
+        <th>Guess Number</th>
+        <th>Guess Image</th>
+        <th>Distance (km)</th>
+        <th>Time (years)</th>
+      </tr>
 
-</table>
-    <input id="input">
+    </table>
+    <div>Put your guess here:</div>
+    <input placeholder="e.g. Isaac Newton" id="input">
+  </div>
   <script defer src="script.js"></script>
 </body>
 
