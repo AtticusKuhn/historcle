@@ -1,11 +1,15 @@
 const table = document.getElementById("table")
 const input = document.getElementById("input")
 const day = document.getElementById("day")
+const next = document.getElementById("next")
 
 let guessNumber = 0
 const startDate = new Date(`May 1 2022`)
 const now = new Date();
 const numberOfDays = Math.floor((now.getTime() - startDate.getTime()) / 86400000);
+const midnight = new Date();
+midnight.setHours(24);
+next.innerText = ((midnight.getTime() - now.getTime()) / 3600000).toString();
 day.innerText = numberOfDays.toString();
 const secretPerson = people[numberOfDays]//"Richard Nixon"
 console.log("the secret person is", secretPerson)

@@ -3,11 +3,39 @@ html, body {
   height: 100%;
 }
 #main {
-  padding: 2% 7%;
+  padding: 2% 10%;
 }
 #table {
+  margin: 0 auto;
   min-height: 150px;
 }
 #table tr:nth-child(even){
   background-color: #f2f2f2;
+  text-align: center;
+}
+#title {
+  text-align: center;
+}
+#input {
+  width: 40%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#guess-instructions {
+  padding: 2%;
+  font-weight: bold;
+}
+#guess{
+  padding: 5%;
+  align-items: center;
+  text-align: center;
+}
+#img {
+  width: 10%;
+  height: 10%;
+  margin: 0 auto;
 }

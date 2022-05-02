@@ -4,13 +4,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
+  <meta name="description" content="A historical person guessing-game. Like wordle">
+  <meta name="keywords" content="history, wordle, guessing, game, historical person">
+  <meta name="author" content="Atticus Kuhn">
+  <meta property="og:title" content="Historcle - a history guessing game" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/peel.jpg" />
+  <meta property="og:url" content="https://atticuskuhn.github.io/historcle/" />
+  <link rel="icon" type="image/x-icon" href="/peel.jpg">
+
   <title>Historcle</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
   <div id="main">
-    <h1>Historcle: A History Guessing Game</h1>
+    <div style="text-align: center;">
+      <img id="img" alt="who am I?" title="who am I?" src="/peel.jpg">
+    </div>
+    <h1 id="title">Historcle: A History Guessing Game</h1>
     <p>I have thought of a secret historical figure. Can you guess him? For each guess I will tell you
       how many years apart the two figures were born, and how far away they were born.
       Please note that as I am pulling these figures from <a href="https://en.wikipedia.org/">Wikipedia</a>,you must be
@@ -22,7 +34,7 @@
     <p>
       This game is just like wordle, in that there will be a new secret historical figure to guess each
       day. Right now we are on day
-      <span id="day"></span>.
+      <span id="day"></span>. The next day starts in <span id="next"></span> hours.
     </p>
     <p>
       By the way, this game is quite challenging because there are very many historical figures (at least 1000),
@@ -39,8 +51,10 @@
       </tr>
 
     </table>
-    <div>Put your guess here:</div>
-    <input placeholder="e.g. Isaac Newton" id="input">
+    <div id="guess">
+      <div id="guess-instructions">Put your guess here:</div>
+      <input placeholder="e.g. Isaac Newton" id="input">
+    </div>
   </div>
   <script src="people.js"></script>
 
