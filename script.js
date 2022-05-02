@@ -28,18 +28,19 @@ ORDER BY DESC(?v)
 LIMIT 400
 */
 const makeQuery = (guess) => `
-SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common where { 
+SELECT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common where { 
     VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
-    ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
     ?person1 dbo:birthDate|dbp:birthDate ?birth1 .
-    ?person2 dbp:birthPlace ?place2 .
     ?person2 dbp:birthDate ?birth2 .
-   
-    bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
+     bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
+ ?person2 dbp:birthPlace ?place2 .
+    ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
+
   
-    ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
+    
+   ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
     ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
     bind(bif:st_distance(?point1, ?point2) as ?dist)
   
@@ -67,11 +68,12 @@ SELECT DISTINCT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?p
 
   }
   GROUP BY ?common
-  LIMIT 4
-
-`
+  LIMIT 4`
 const makeUrl = (query) =>
-    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent((query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
+    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=PREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0APREFIX%20xsd%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E%0APREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20foaf%3A%20%3Chttp%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2F%3E%0APREFIX%20dc%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0APREFIX%20%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2F%3E%0APREFIX%20dbpedia2%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%0APREFIX%20dbpedia%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2F%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0A${encodeURIComponent(query)}&format=application/sparql-results%2Bjson`
+// `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
+// `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
+// `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent((query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
 const fmt = (stuff) => stuff.split("/")[stuff.split("/").length - 1].replace(/\d/g, "").replace(/[A-Z]/g, letter => ` ${letter}`)
 const flat = (results) => results.reduce((acc, curr) => {
     console.log("curr", curr)
@@ -106,7 +108,13 @@ const matches = async (guess, person) => {
 
 const request = async (guess) => {
     const url = makeUrl(makeQuery(guess));
-    const req = await fetch(url);
+    const req = await fetch(url, {
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "body": null,
+        "method": "GET",
+        "mode": "cors",
+        "credentials": "omit"
+    });
     const json = await req.json();
     console.log(json)
     try {
