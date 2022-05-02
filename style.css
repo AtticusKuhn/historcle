@@ -8,10 +8,10 @@ html, body {
 #table {
   margin: 0 auto;
   min-height: 150px;
+  text-align: center;
 }
 #table tr:nth-child(even){
   background-color: #f2f2f2;
-  text-align: center;
 }
 #title {
   text-align: center;
