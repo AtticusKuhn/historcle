@@ -28,25 +28,35 @@ ORDER BY DESC(?v)
 LIMIT 400
 */
 const makeQuery = (guess) => `
-SELECT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common where { 
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX : <http://dbpedia.org/resource/>
+PREFIX dbpedia2: <http://dbpedia.org/property/>
+PREFIX dbpedia: <http://dbpedia.org/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT  ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common (year(?birth1) - year(?birth2))  where { 
     VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
     ?person1 dbo:birthDate|dbp:birthDate ?birth1 .
     ?person2 dbp:birthDate ?birth2 .
-     bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
  ?person2 dbp:birthPlace ?place2 .
     ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
 
-  
+
     
    ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
     ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
     bind(bif:st_distance(?point1, ?point2) as ?dist)
   
-    ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
-  
+
     OPTIONAL{
+        ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
+
     ?person1 rdf:type ?common .
     ?person2 rdf:type ?common .
    { ?common rdfs:subClassOf* yago:Person100007846 .}
@@ -60,10 +70,9 @@ SELECT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?im
 
 
   }
-  GROUP BY ?common
-  LIMIT 4`
+`
 const makeUrl = (query) =>
-    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=PREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0APREFIX%20xsd%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E%0APREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20foaf%3A%20%3Chttp%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2F%3E%0APREFIX%20dc%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0APREFIX%20%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2F%3E%0APREFIX%20dbpedia2%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%0APREFIX%20dbpedia%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2F%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0A${encodeURIComponent(query)}&format=application/sparql-results%2Bjson`
+    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&format=application/sparql-results%2Bjson`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent((query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
@@ -108,6 +117,13 @@ const request = async (guess) => {
         "mode": "cors",
         "credentials": "omit"
     });
+    // const req = await fetch("https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=PREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0APREFIX%20xsd%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E%0APREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20foaf%3A%20%3Chttp%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2F%3E%0APREFIX%20dc%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0APREFIX%20%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2F%3E%0APREFIX%20dbpedia2%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%0APREFIX%20dbpedia%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2F%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20%3Fbirthdiff%20%3Fperson1%20%3Fperson2%20%3Fbirth1%20%3Fbirth2%20%20%3Fplace1%20%3Fplace2%20%3Fpoint1%20%3Fimage%20%3Fdist%20%3Fcommon%20where%20%7B%20%0D%0A%20%20%20%20VALUES%20%3Fperson2%20%7B%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FPope_John_Paul_II%3E%20%7D%0D%0A%20%20%20%20%3Fperson1%20rdfs%3Alabel%20%22George%20V%22%40en%20.%20%230.7259981943556173%0D%0A%20%20%0D%0A%20%20%20%20%3Fperson1%20dbo%3AbirthDate%7Cdbp%3AbirthDate%20%3Fbirth1%20.%0D%0A%20%20%20%20%3Fperson2%20dbp%3AbirthDate%20%3Fbirth2%20.%0D%0A%20%20%20%20%20bind(%20xsd%3Ainteger(REPLACE(str(%3Fbirth1)%2C%20%22(%5C%5Cd%2B)-.*%22%2C%20%22%241%22))%20-%20xsd%3Ainteger(REPLACE(str(%3Fbirth2)%2C%20%22(%5C%5Cd%2B)-.*%22%2C%20%22%241%22))%20as%20%3Fbirthdiff%20)%0D%0A%20%3Fperson2%20dbp%3AbirthPlace%20%3Fplace2%20.%0D%0A%20%20%20%20%3Fperson1%20dbo%3AbirthPlace%7Cdbp%3AbirthPlace%20%3Fplace1%20.%0D%0A%0D%0A%20%20%0D%0A%20%20%20%20%0D%0A%20%20%20%3Fplace1%20%3Chttp%3A%2F%2Fwww.w3.org%2F2003%2F01%2Fgeo%2Fwgs84_pos%23geometry%3E%20%3Fpoint1%20.%0D%0A%20%20%20%20%3Fplace2%20%3Chttp%3A%2F%2Fwww.w3.org%2F2003%2F01%2Fgeo%2Fwgs84_pos%23geometry%3E%20%3Fpoint2%20.%20%0D%0A%20%20%20%20bind(bif%3Ast_distance(%3Fpoint1%2C%20%3Fpoint2)%20as%20%3Fdist)%0D%0A%20%20%0D%0A%20%20%20%20%3Fperson1%20%3Chttp%3A%2F%2Fdbpedia.org%2Fontology%2Fthumbnail%3E%20%3Fimage.%0D%0A%20%20%0D%0A%20%20%20%20OPTIONAL%7B%0D%0A%20%20%20%20%3Fperson1%20rdf%3Atype%20%3Fcommon%20.%0D%0A%20%20%20%20%3Fperson2%20rdf%3Atype%20%3Fcommon%20.%0D%0A%20%20%20%7B%20%3Fcommon%20rdfs%3AsubClassOf*%20yago%3APerson100007846%20.%7D%0D%0A%20%20%20UNION%0D%0A%20%20%20%7B%20%3Fcommon%20rdfs%3AsubClassOf*%20dbo%3APerson%20.%7D%0D%0A%0D%0A%20%20%20%20%7D%0D%0A%20%20%20%0D%0A%20%20%20%20FILTER(%3Fbirth1%20!%3D%20%22%22%40en)%0D%0A%20%20%20%20FILTER(datatype(%3Fbirth1)%20!%3D%20xsd%3AgMonthDay)%0D%0A%0D%0A%0D%0A%20%20%7D%0D%0A%20%20GROUP%20BY%20%3Fcommon%0D%0A%20%20LIMIT%204&format=application/sparql-results%2Bjson", {
+    //     "referrerPolicy": "strict-origin-when-cross-origin",
+    //     "body": null,
+    //     "method": "GET",
+    //     "mode": "cors",
+    //     "credentials": "omit"
+    // });
     const json = await req.json();
     console.log(json)
     try {
@@ -130,7 +146,7 @@ input.addEventListener("keyup", async ({ key }) => {
             return;
         }
         waiting = true
-        if (await matches(value, secretPerson)) {
+        if (false/*await matches(value, secretPerson)*/) {
             alert("you win!")
             waiting = false
             return;
