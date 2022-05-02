@@ -54,14 +54,7 @@ SELECT ?birthdiff ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?im
    { ?common rdfs:subClassOf* dbo:Person .}
 
     }
-     MINUS {
-       ?person1 dbo:birthPlace ?placesub1 .
-       ?placesub1 dbo:subdivision ?place1 .
-       ?person2 dbo:birthPlace ?placesub2 .
-       ?placesub2 dbo:subdivision ?place2 .
-       ?place2 dbo:country ?placesub2 .
-       ?place1 dbo:country ?placesub1 .
-    }
+   
     FILTER(?birth1 != ""@en)
     FILTER(datatype(?birth1) != xsd:gMonthDay)
 
