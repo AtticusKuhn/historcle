@@ -38,7 +38,7 @@ PREFIX : <http://dbpedia.org/resource/>
 PREFIX dbpedia2: <http://dbpedia.org/property/>
 PREFIX dbpedia: <http://dbpedia.org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`
-const makeQuery = (guess) => `SELECT ?bruh${reqs} ?birth1 ?birth2 ?image ?dist ?common  where { 
+const makeQuery = (guess) => `SELECT ?birth1 ?birth2 ?image ?dist ?common  where { 
     VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
@@ -53,9 +53,11 @@ const makeQuery = (guess) => `SELECT ?bruh${reqs} ?birth1 ?birth2 ?image ?dist ?
     ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
     bind(bif:st_distance(?point1, ?point2) as ?dist)
   
+OPTIONAL {
+    ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
 
+}
     OPTIONAL{
-        ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
 
     ?person1 rdf:type ?common .
     ?person2 rdf:type ?common .
@@ -111,6 +113,17 @@ const matches = async (guess, person) => {
 const request = async (guess) => {
     const url = makeUrl(makeQuery(guess));
     const req = await fetch(url, {
+        "headers": {
+            "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+            "cache-control": "max-age=0",
+            "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Chrome OS\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+        },
         "referrerPolicy": "strict-origin-when-cross-origin",
         "body": null,
         "method": "GET",
