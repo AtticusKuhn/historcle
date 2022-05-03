@@ -38,7 +38,7 @@ PREFIX : <http://dbpedia.org/resource/>
 PREFIX dbpedia2: <http://dbpedia.org/property/>
 PREFIX dbpedia: <http://dbpedia.org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`
-const makeQuery = (guess) => `SELECT ?birth1 ?birth2 ?image ?dist ?common  where { 
+const makeQuery = (guess) => `SELECT ?bruh${reqs} ?birth1 ?birth2 ?image ?dist ?common ?birthdiff where { 
     VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
@@ -52,7 +52,7 @@ const makeQuery = (guess) => `SELECT ?birth1 ?birth2 ?image ?dist ?common  where
    ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
     ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
     bind(bif:st_distance(?point1, ?point2) as ?dist)
-  
+    bind( xsd:integer(REPLACE(str(?birth1), "(\\\\d+)-.*", "$1")) - xsd:integer(REPLACE(str(?birth2), "(\\\\d+)-.*", "$1")) as ?birthdiff )
 OPTIONAL {
     ?person1 <http://dbpedia.org/ontology/thumbnail> ?image.
 
