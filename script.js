@@ -176,7 +176,7 @@ input.addEventListener("keyup", async ({ key }) => {
     <td><img width="100" height="100" src="${result.image.value}"></td>
     <td>${result.dist?.value || "unknown"}</td>
     <td>${result.birthdiff?.value || "unknown"}</td>
-    <td>${[...result.common].map(fmt).join("<br>")}</td>
+    <td>${[...new Set([...result.common].map(fmt))].join("<br>")}</td>
 
 
 `;
