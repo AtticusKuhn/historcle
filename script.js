@@ -27,8 +27,7 @@ GROUP BY ?p
 ORDER BY DESC(?v)
 LIMIT 400
 */
-const makeQuery = (guess) => `
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
+const makeQuery = (guess) => `PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -38,7 +37,7 @@ PREFIX : <http://dbpedia.org/resource/>
 PREFIX dbpedia2: <http://dbpedia.org/property/>
 PREFIX dbpedia: <http://dbpedia.org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-SELECT  ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist ?common (year(?birth1) - year(?birth2))  where { 
+SELECT ?bruh ?birth1 ?birth2 ?image ?dist ?common  where { 
     VALUES ?person2 {<${secretPerson}> }
     ?person1 rdfs:label "${guess}"@en .
   
@@ -46,7 +45,7 @@ SELECT  ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist 
     ?person2 dbp:birthDate ?birth2 .
  ?person2 dbp:birthPlace ?place2 .
     ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
-
+  
 
     
    ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
@@ -70,9 +69,10 @@ SELECT  ?person1 ?person2 ?birth1 ?birth2  ?place1 ?place2 ?point1 ?image ?dist 
 
 
   }
+  GROUP BY ?common
 `
 const makeUrl = (query) =>
-    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&format=application/sparql-results%2Bjson`
+    `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query).replace(/%0A/g, "%0D%0A")}&format=application/sparql-results%2Bjson`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent(query)}&output=json`
 // `https://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=${encodeURIComponent((query))}&format=application%2Fsparql-results%2Bjson&CXML_redir_for_subjs=121&CXML_redir_for_hrefs=&timeout=300000&debug=on&run=%20Run%20Query%20`
