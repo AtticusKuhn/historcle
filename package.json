@@ -1,0 +1,27 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "next",
+        "build": "next build",
+        "start": "next start",
+        "type-check": "tsc",
+        "deploy": "NODE_ENV=production next build && next export -o dist && touch dist/.nojekyll && git add dist && git commit -m \"Initial dist subtree commit\" && git subtree push --prefix dist origin gh-pages",
+        "postbuild": "next-sitemap"
+    },
+    "dependencies": {
+        "@reduxjs/toolkit": "^1.6.1",
+        "next": "latest",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-redux": "^7.2.4"
+    },
+    "devDependencies": {
+        "@types/node": "^12.12.21",
+        "@types/react": "^17.0.2",
+        "@types/react-dom": "^17.0.1",
+        "postcss-preset-env": "^7.2.3",
+        "tailwindcss": "^3.0.15",
+        "typescript": "4.0",
+        "@types/react-redux": "^7.1.18"
+    }
+}
