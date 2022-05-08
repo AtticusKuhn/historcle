@@ -46,9 +46,7 @@ const makeQuery = (guess) => `SELECT ?bruh${reqs} ?birth1 ?birth2 ?image ?dist ?
     ?person2 dbp:birthDate ?birth2 .
  ?person2 dbp:birthPlace ?place2 .
     ?person1 dbo:birthPlace|dbp:birthPlace ?place1 .
-  
 
-    
    ?place1 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point1 .
     ?place2 <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point2 . 
     bind(bif:st_distance(?point1, ?point2) as ?dist)
@@ -69,8 +67,6 @@ OPTIONAL {
    
     FILTER(?birth1 != ""@en)
     FILTER(datatype(?birth1) != xsd:gMonthDay)
-
-
   }
   GROUP BY ?common`
 const makeUrl = (query) =>
