@@ -1,18 +1,18 @@
-import { asyncGuess, dismissError, useDisp, useSel } from "../redux"
+import { asyncGuess, dismissError, setCurrentGuess, useDisp, useSel } from "../redux"
 
 const Input: React.FC<{}> = () => {
     const waiting = useSel(x => x.waiting)
     const won = useSel(x => x.won)
-    const person = useSel(x => x.secretPerson)
     const error = useSel(x => x.error)
 
     const dispatch = useDisp()
-    const oninput = (key: React.KeyboardEvent<HTMLInputElement>) => {
+    const oninput = async (key: React.KeyboardEvent<HTMLInputElement>) => {
+        const t = (key.target as HTMLInputElement);
         if (key.key === "Enter") {
-            const a = dispatch(asyncGuess({
-                guess: (key.target as HTMLInputElement).value,
-                secretPerson: person
-            }))
+            dispatch(asyncGuess())
+            t.value = "";
+        } else {
+            dispatch(setCurrentGuess(t.value))
         }
     }
     return <>

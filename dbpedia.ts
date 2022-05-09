@@ -190,22 +190,18 @@ export const request = async (guess: string, secretPerson: string): Promise<res>
     })).then(x => x.flat(1))
 
     console.log(results)
-    try {
-        if (results.length === 0) {
-            throw new Error(`no resulst`)
-        };
-        const result = flat(results);
-        console.log(result)
-        return {
-            dist: result?.dist?.value ? Number(result.dist.value) : null,
-            hints: [...result.common],
-            name: guess,
-            time: Number(result.birthdiff.value),
-            image: result.image.value,
-        };
-    } catch (e) {
-        // alert("I had an error")
-        console.error(e)
-    }
+    // try {
+    if (results.length === 0) {
+        throw new Error(`no resulst`)
+    };
+    const result = flat(results);
+    console.log(result)
+    return {
+        dist: result?.dist?.value ? Number(result.dist.value) : null,
+        hints: [...result.common],
+        name: guess,
+        time: Number(result.birthdiff.value),
+        image: result.image.value,
+    };
 
 }

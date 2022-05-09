@@ -15,7 +15,7 @@ const Guesses: React.FC<{}> = () => {
             </tr>
         </thead>
         <tbody>
-            {guesses.map((guess, index) => <tr key={index} className="even:bg-primary-100 odd:bg-primary-200">
+            {guesses.map((guess, index) => <tr key={index} className="even:bg-primary-100 odd:bg-primary-200 rounded">
                 <td>{index + 1}</td>
                 <td><img width="100" height="100" src={guess.image} /></td>
                 <td>{guess.dist === null ? "[a bug occured]" : guess.dist}</td>

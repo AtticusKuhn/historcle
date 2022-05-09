@@ -27,6 +27,7 @@ export type InitialState = {
     modalOpen: boolean,
     day: number,
     error: string | null,
+    currentGuess: string,
 }
 
 const startDate = new Date(`May 2 2022`)
@@ -56,17 +57,20 @@ export const initialState: InitialState = {
     secretPerson: secretPerson,
     modalOpen: false,
     day: numberOfDays,
-    error: null
+    error: null,
+    currentGuess: "",
 }
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
-    async ({ guess, secretPerson }: { guess: string, secretPerson: string }, config) => {
+    async (_a, config) => {
+        const state = (config.getState() as InitialState)
         const a = await config.dispatch(asyncMatches({
-            guess: guess,
-            secretPerson: secretPerson
+            guess: state.currentGuess,
+            secretPerson: state.secretPerson
         }))
-        if (!(config.getState() as InitialState).won) {
-            const response = await request(guess, secretPerson)
+        console.log("a", a)
+        if (!a.payload/*!(config.getState() as InitialState).won*/) {
+            const response = await request(state.currentGuess, state.secretPerson)
 
             // The value we return becomes the `fulfilled` action payload
             return response
@@ -100,7 +104,10 @@ export const slice = createSlice({
         },
         dismissError: (state) => {
             state.error = null;
-        }
+        },
+        setCurrentGuess: (state, guess: PayloadAction<string>) => {
+            state.currentGuess = guess.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -111,9 +118,11 @@ export const slice = createSlice({
                 state.waiting = false
                 if (action.payload !== undefined) {
                     state.guesses.push(action.payload)
-                } else {
-                    state.error = "Cannot find person"
                 }
+            })
+            .addCase(asyncGuess.rejected, (state, action) => {
+                state.waiting = false
+                state.error = `Cannot find person: ${state.currentGuess}`
             })
             .addCase(asyncMatches.fulfilled, (state, action) => {
                 if (action.payload) {
@@ -125,7 +134,7 @@ export const slice = createSlice({
     },
 })
 
-export const { closeModal, setDay, setPerson, dismissError } = slice.actions
+export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value

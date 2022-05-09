@@ -55,6 +55,7 @@ const WonModal: React.FC<{}> = () => {
                     <button onClick={() => {
                         navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length} guesses` + guesses.map((guess, index) => `
                         ${index + 1}  ${guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}  ${guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"} ${guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}
+                        https://atticuskuhn.github.io/historcle/
                     `).join("\n"));
                     }} className="text-white bg-accent hover:bg-accent-hover rounded p-sm">
                         Copy results
