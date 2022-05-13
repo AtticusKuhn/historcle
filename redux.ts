@@ -49,17 +49,33 @@ const secretPerson: string =/* usedDefinedPerson
     people[numberOfDays]
 
 console.log("secretPerson", secretPerson)
-
-export const initialState: InitialState = {
-    guesses: [],
-    waiting: false,
-    won: false,
-    secretPerson: secretPerson,
-    modalOpen: false,
-    day: numberOfDays,
-    error: null,
-    currentGuess: "",
+const getLocalStorage = () => {
+    if (typeof window !== "undefined") {
+        return localStorage.getItem('reduxState')
+    }
 }
+const persistedState: InitialState = getLocalStorage()
+    ? JSON.parse(getLocalStorage())
+    : {
+        guesses: [],
+        waiting: false,
+        won: false,
+        secretPerson: secretPerson,
+        modalOpen: false,
+        day: numberOfDays,
+        error: null,
+        currentGuess: "",
+    }
+export const initialState: InitialState = Object.assign(persistedState, {
+    // guesses: [],
+    // waiting: false,
+    // won: false,
+    secretPerson: secretPerson,
+    // modalOpen: false,
+    day: numberOfDays,
+    // error: null,
+    // currentGuess: "",
+});
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
     async (_a, config) => {
@@ -144,3 +160,6 @@ export const makeStore = () => configureStore({
     reducer: slice.reducer,
 });
 export const store = makeStore()
+store.subscribe(() => {
+    localStorage.setItem('reduxState', JSON.stringify(store.getState()))
+})
