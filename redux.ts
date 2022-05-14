@@ -154,8 +154,9 @@ export const slice = createSlice({
         setCurrentGuess: (state, guess: PayloadAction<string>) => {
             state.currentGuess = guess.payload;
         },
-        setState: (state, newState: PayloadAction<InitialState>) => {
-            if (newState.payload.day === state.day) {
+        setState: (state, newState: PayloadAction<InitialState | null>) => {
+            console.log("setState")
+            if (newState.payload && newState.payload.day === state.day) {
                 state.currentGuess = newState.payload.currentGuess
                 state.day = newState.payload.day
                 state.error = newState.payload.error
@@ -242,12 +243,11 @@ export const makeStore = () => configureStore({
 });
 export const store = makeStore()
 store.subscribe(() => {
-    // console.log(store.getState())
+    console.log(store.getState())
     if (!store.getState().default) {
         console.log("setting")
         localStorage.setItem('reduxState', JSON.stringify(store.getState()))
     }
-    // store.dispatch(setDefault())
 
 
 })

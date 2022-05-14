@@ -29,6 +29,8 @@ const IndexPage = () => {
         if (storage) {
             storage.default = false;
             disp(setState(storage))
+        } else {
+            disp(setState(null))
         }
 
     }, [])
