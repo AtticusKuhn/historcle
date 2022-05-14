@@ -1,4 +1,4 @@
-import { configureStore, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { AnyAction, configureStore, createAsyncThunk, createSlice, Dispatch, MiddlewareAPI, PayloadAction } from '@reduxjs/toolkit'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { getSuggestions, matches, request } from './dbpedia'
 import { people } from "./people"
@@ -156,17 +156,20 @@ export const slice = createSlice({
             if (newState.payload.day === state.day) {
                 state.currentGuess = newState.payload.currentGuess
                 state.day = newState.payload.day
-                state.error = newState.payload.currentGuess
+                state.error = newState.payload.error
                 state.guesses = newState.payload.guesses
                 state.modalOpen = newState.payload.modalOpen
                 state.secretPerson = newState.payload.secretPerson
-                state.waiting = newState.payload.waiting
+                // state.waiting = newState.payload.waiting
                 state.won = newState.payload.won
+                state.suggestions = newState.payload.suggestions
             }
-        },
-        setDefault: (state) => {
             state.default = false;
-        }
+
+        },
+        // setDefault: (state) => {
+        //     state.default = false;
+        // }
     },
     extraReducers: (builder) => {
         builder
@@ -199,14 +202,24 @@ export const slice = createSlice({
 // }
 
 // const persistedReducer = persistReducer(persistConfig, slice.reducer)
-export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, setDefault } = slice.actions
+export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value
 
 export default slice.reducer
+// const storeActionLocalStorage = (store: MiddlewareAPI<Dispatch<AnyAction>, InitialState>) => (next: Dispatch<AnyAction>) => (action: AnyAction) => {
+//     next(action)
+//     // const state = store.getState()
+//     // console.log("storeActionInChrome called", state)
+//     localStorage.setItem('reduxState', JSON.stringify(store.getState()))
+
+//     return;
+// }
+
 export const makeStore = () => configureStore({
     reducer: slice.reducer,
+    // middleware: [storeActionLocalStorage]
 });
 export const store = makeStore()
 store.subscribe(() => {
@@ -214,8 +227,8 @@ store.subscribe(() => {
     if (!store.getState().default) {
         console.log("setting")
         localStorage.setItem('reduxState', JSON.stringify(store.getState()))
-    } else {
-        store.dispatch(setDefault())
     }
+    // store.dispatch(setDefault())
+
 
 })

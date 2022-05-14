@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import Rules from "../components/Rules"
-import WonModal from "../components/WonModal"
-import Guesses from "../components/Guesses"
-import Input from "../components/Input"
-import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
+import Guesses from "../components/Guesses";
+import Input from "../components/Input";
+import Rules from "../components/Rules";
+import WonModal from "../components/WonModal";
 import { InitialState, setDay, setPerson, setState } from "../redux";
-import Head from "next/head";
 
 
 
@@ -14,12 +12,7 @@ const IndexPage = () => {
     const disp = useDispatch();
     // const router = useRouter()
     useEffect(() => {
-        const storage: InitialState = JSON.parse(localStorage.getItem("reduxState"))
 
-        if (storage) {
-            storage.default = false;
-            disp(setState(storage))
-        }
         const query = new URLSearchParams(window.location.search)
         const day = query.get("day")
         console.log("day", day)
@@ -29,6 +22,12 @@ const IndexPage = () => {
         }
         if (person && typeof person === "string") {
             disp(setPerson(atob(person)))
+        }
+        const storage: InitialState = JSON.parse(localStorage.getItem("reduxState"))
+
+        if (storage) {
+            storage.default = false;
+            disp(setState(storage))
         }
 
     }, [])
