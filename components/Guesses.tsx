@@ -16,7 +16,7 @@ const Guesses: React.FC<{}> = () => {
             </tr>
         </thead>
         <tbody>
-            {guesses.map((guess, index) => <Guess guess={guess} index={index} />)}
+            {guesses.map((guess, index) => <Guess key={index} guess={guess} index={index} />)}
         </tbody>
     </table>
 }

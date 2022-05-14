@@ -1,6 +1,6 @@
 import { configureStore, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { matches, request } from './dbpedia'
+import { getSuggestions, matches, request } from './dbpedia'
 import { people } from "./people"
 // import { useRouter } from 'next/router'
 // const router = useRouter()
@@ -19,6 +19,9 @@ export type guess = {
     hints: string[],
     image: string,
 }
+export type suggestion = {
+    name: string,
+}
 export type InitialState = {
     guesses: guess[],
     waiting: boolean,
@@ -28,6 +31,8 @@ export type InitialState = {
     day: number,
     error: string | null,
     currentGuess: string,
+    default?: boolean,
+    suggestions: suggestion[]
 }
 
 const startDate = new Date(`May 2 2022`)
@@ -49,33 +54,48 @@ const secretPerson: string =/* usedDefinedPerson
     people[numberOfDays]
 
 console.log("secretPerson", secretPerson)
-const getLocalStorage = () => {
-    if (typeof window !== "undefined") {
-        return localStorage.getItem('reduxState')
-    }
-}
-const persistedState: InitialState = getLocalStorage()
-    ? JSON.parse(getLocalStorage())
-    : {
-        guesses: [],
-        waiting: false,
-        won: false,
-        secretPerson: secretPerson,
-        modalOpen: false,
-        day: numberOfDays,
-        error: null,
-        currentGuess: "",
-    }
-export const initialState: InitialState = Object.assign(persistedState, {
-    // guesses: [],
-    // waiting: false,
-    // won: false,
+// const getLocalStorage = (): InitialState => {
+//     if (typeof window !== "undefined" && localStorage.getItem('reduxState')) {
+//         return JSON.parse(localStorage.getItem('reduxState'))
+//     } else {
+//         return {
+//             guesses: [],
+//             waiting: false,
+//             won: false,
+//             secretPerson: secretPerson,
+//             modalOpen: false,
+//             day: numberOfDays,
+//             error: null,
+//             currentGuess: "",
+//         }
+//     }
+// }
+// console.log(`getLocalStorage().day === numberOfDays`, getLocalStorage(), numberOfDays)
+// const persistedState: InitialState = (getLocalStorage() && getLocalStorage().day === numberOfDays)
+//     ? getLocalStorage()
+//     : {
+//         guesses: [],
+//         waiting: false,
+//         won: false,
+//         secretPerson: secretPerson,
+//         modalOpen: false,
+//         day: numberOfDays,
+//         error: null,
+//         currentGuess: "",
+//     }
+
+export const initialState: InitialState = {
+    guesses: [],
+    waiting: false,
+    won: false,
     secretPerson: secretPerson,
-    // modalOpen: false,
+    modalOpen: false,
     day: numberOfDays,
-    // error: null,
-    // currentGuess: "",
-});
+    error: null,
+    currentGuess: "",
+    default: true,
+    suggestions: []
+};
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
     async (_a, config) => {
@@ -98,6 +118,14 @@ export const asyncMatches = createAsyncThunk(
     async ({ guess, secretPerson }: { guess: string, secretPerson: string }) => {
         const response = await matches(guess, secretPerson)
         // The value we return becomes the `fulfilled` action payload
+        return response
+    }
+)
+export const asyncSuggestions = createAsyncThunk(
+    'state/suggestions',
+    async (_a, config) => {
+        const state = (config.getState() as InitialState)
+        const response = await getSuggestions(state.currentGuess)
         return response
     }
 )
@@ -124,6 +152,21 @@ export const slice = createSlice({
         setCurrentGuess: (state, guess: PayloadAction<string>) => {
             state.currentGuess = guess.payload;
         },
+        setState: (state, newState: PayloadAction<InitialState>) => {
+            if (newState.payload.day === state.day) {
+                state.currentGuess = newState.payload.currentGuess
+                state.day = newState.payload.day
+                state.error = newState.payload.currentGuess
+                state.guesses = newState.payload.guesses
+                state.modalOpen = newState.payload.modalOpen
+                state.secretPerson = newState.payload.secretPerson
+                state.waiting = newState.payload.waiting
+                state.won = newState.payload.won
+            }
+        },
+        setDefault: (state) => {
+            state.default = false;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -149,8 +192,14 @@ export const slice = createSlice({
             })
     },
 })
+// const persistConfig = {
+//     key: 'primary',
+//     storage,
+//     whitelist: ['exampleData'], // place to select which state you want to persist
+// }
 
-export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess } = slice.actions
+// const persistedReducer = persistReducer(persistConfig, slice.reducer)
+export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, setDefault } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value
@@ -161,5 +210,12 @@ export const makeStore = () => configureStore({
 });
 export const store = makeStore()
 store.subscribe(() => {
-    localStorage.setItem('reduxState', JSON.stringify(store.getState()))
+    // console.log(store.getState())
+    if (!store.getState().default) {
+        console.log("setting")
+        localStorage.setItem('reduxState', JSON.stringify(store.getState()))
+    } else {
+        store.dispatch(setDefault())
+    }
+
 })

@@ -1,3 +1,5 @@
+import { suggestion } from "./redux"
+
 let reqs: number = 2
 const keys: string[] = ["birthdiff", "dist"]
 /* I used this query to generate the people
@@ -204,4 +206,33 @@ export const request = async (guess: string, secretPerson: string): Promise<res>
         image: result.image.value,
     };
 
+}
+
+export const getSuggestions = async (query: string): Promise<suggestion[]> => {
+    const req = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&formatversion=2&search=${encodeURIComponent(query)}&namespace=0&limit=10`, {
+        "headers": {
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+            "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
+            "sec-ch-ua-arch": "\"x86\"",
+            "sec-ch-ua-bitness": "\"64\"",
+            "sec-ch-ua-full-version-list": "\" Not A;Brand\";v=\"99.0.0.0\", \"Chromium\";v=\"99.0.4844.94\", \"Google Chrome\";v=\"99.0.4844.94\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-model": "",
+            "sec-ch-ua-platform": "\"Chrome OS\"",
+            "sec-ch-ua-platform-version": "\"14469.59.0\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "x-requested-with": "XMLHttpRequest"
+        },
+        "referrer": "https://en.wikipedia.org/wiki/Main_Page",
+        "referrerPolicy": "origin-when-cross-origin",
+        "body": null,
+        "method": "GET",
+        "mode": "cors",
+        "credentials": "include"
+    })
+    const json = await req.json()
+    return json[1]
 }

@@ -12,3 +12,7 @@ Here is an example game.
 | 2   | George Washington        |	653|142| Politician| 
 
 If you want to play, go to https://atticuskuhn.github.io/historcle/
+
+# Todos
+ - persist games in localstorage
+ - have autocompletion based on
