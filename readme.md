@@ -14,5 +14,4 @@ Here is an example game.
 If you want to play, go to https://atticuskuhn.github.io/historcle/
 
 # Todos
- - persist games in localstorage
  - have autocompletion based on

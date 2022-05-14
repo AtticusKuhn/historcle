@@ -21,6 +21,8 @@ export type guess = {
 }
 export type suggestion = {
     name: string,
+    image?: string,
+    description: string,
 }
 export type InitialState = {
     guesses: guess[],
@@ -98,15 +100,15 @@ export const initialState: InitialState = {
 };
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
-    async (_a, config) => {
+    async (guess: string, config) => {
         const state = (config.getState() as InitialState)
         const a = await config.dispatch(asyncMatches({
-            guess: state.currentGuess,
+            guess: guess,
             secretPerson: state.secretPerson
         }))
         console.log("a", a)
         if (!a.payload/*!(config.getState() as InitialState).won*/) {
-            const response = await request(state.currentGuess, state.secretPerson)
+            const response = await request(guess, state.secretPerson)
 
             // The value we return becomes the `fulfilled` action payload
             return response
@@ -176,6 +178,7 @@ export const slice = createSlice({
             .addCase(asyncGuess.pending, (state) => {
                 state.waiting = true
             })
+
             .addCase(asyncGuess.fulfilled, (state, action) => {
                 state.waiting = false
                 if (action.payload !== undefined) {
@@ -186,12 +189,28 @@ export const slice = createSlice({
                 state.waiting = false
                 state.error = `Cannot find person: ${state.currentGuess}`
             })
+            .addCase(asyncMatches.pending, (state) => {
+                state.waiting = true
+            })
             .addCase(asyncMatches.fulfilled, (state, action) => {
                 if (action.payload) {
                     state.won = true
                     state.modalOpen = true
 
                 }
+                // state.waiting = false;
+            })
+            .addCase(asyncSuggestions.pending, (state) => {
+                // state.waiting = true
+            })
+            .addCase(asyncSuggestions.fulfilled, (state, action) => {
+                // state.waiting = false
+                state.suggestions = action.payload;
+            })
+            .addCase(asyncSuggestions.rejected, (state, action) => {
+                // state.waiting = false
+                console.log(action)
+                state.error = `wikipedia error?`
             })
     },
 })

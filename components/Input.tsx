@@ -1,24 +1,36 @@
-import { asyncGuess, dismissError, setCurrentGuess, useDisp, useSel } from "../redux"
+import { useRef, useState } from "react"
+import { asyncGuess, asyncSuggestions, dismissError, setCurrentGuess, useDisp, useSel } from "../redux"
 
 const Input: React.FC<{}> = () => {
     const waiting = useSel(x => x.waiting)
     const won = useSel(x => x.won)
     const error = useSel(x => x.error)
-
+    const [previousTime, setPreviousTime] = useState<number>(new Date().getTime())
+    const timeRef = useRef(previousTime);
+    timeRef.current = previousTime;
+    const threshold = 3e3
+    const canReq = (): boolean => new Date().getTime() - timeRef.current > threshold
     const dispatch = useDisp()
     const oninput = async (key: React.KeyboardEvent<HTMLInputElement>) => {
         const t = (key.target as HTMLInputElement);
-        if (key.key === "Enter") {
-            dispatch(asyncGuess())
-            t.value = "";
+
+        dispatch(setCurrentGuess(t.value))
+        if (t.value !== "" && (canReq())) {
+            setPreviousTime(new Date().getTime())
+            dispatch(asyncSuggestions())
         } else {
-            dispatch(setCurrentGuess(t.value))
+            setTimeout(() => {
+                if ((canReq())) {
+                    setPreviousTime(new Date().getTime())
+                    dispatch(asyncSuggestions())
+                }
+            }, threshold)
         }
     }
     return <>
         <div>Put your guess here: {waiting ? "waiting..." : ""}</div>
         <input
-            disabled={waiting || won}
+            readOnly={waiting || won}
             onKeyUp={oninput}
             placeholder="e.g. Isaac Newton"
             className="rounded-lg w-full h-7/12 border-primary-300 bg-primary-200 p-sm m-base mx-auto"

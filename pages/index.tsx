@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import Guesses from "../components/Guesses";
 import Input from "../components/Input";
 import Rules from "../components/Rules";
+import Suggestions from "../components/Suggestions";
 import WonModal from "../components/WonModal";
 import { InitialState, setDay, setPerson, setState } from "../redux";
 
@@ -40,6 +41,7 @@ const IndexPage = () => {
                 <Guesses />
                 <div className="w-full mx-auto mt-3xl">
                     <Input />
+                    <Suggestions />
                 </div>
                 <WonModal />
             </div>
