@@ -227,8 +227,8 @@ export const getSuggestions = async (query: string): Promise<suggestion[]> => {
 }
 const searchQuery = (person: string) => `
 SELECT DISTINCT ?name ?image ?person WHERE { 
-    ?person rdfs:label ?label .
-    ?label bif:contains "${person}" .
+    ?person rdfs:label ?name .
+    ?name bif:contains "${person}" .
     ?person dbo:birthDate|dbp:birthDate ?birth .
     ?person dbo:birthPlace|dbp:birthPlace ?place .
     ?place <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point . 
@@ -236,8 +236,7 @@ SELECT DISTINCT ?name ?image ?person WHERE {
       ?person <http://dbpedia.org/ontology/thumbnail> ?image.
   
   }
-    FILTER(langMatches(lang(?label),"en"))
-  
+    FILTER(langMatches(lang(?name),"en"))
   }
   LIMIT 10
 `;
@@ -245,5 +244,10 @@ export const makeSearch = async (person: string): Promise<search[]> => {
     const url = searchQuery(person);
     const req = await fetch(makeUrl(url));
     const json = await req.json();
-    return json.results.bindings as search[];
+    console.log(`json.results.bindings`, json.results.bindings)
+    return json.results.bindings.map(b => ({
+        name: b?.name?.value,
+        image: b?.image?.value,
+        person: b?.person?.value
+    })) as search[];
 }

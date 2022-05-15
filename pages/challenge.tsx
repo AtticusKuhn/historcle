@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
+import ShowError from "../components/Error";
 import { asyncSearch, asyncSuggestions, setCurrentGuess, useDisp, useSel } from "../redux";
 
 const Challenge: React.FC<{}> = () => {
+    const base = process.env.NODE_ENV === "development" ? "/" : "/historcle/"
 
-    const error = useSel(x => x.error)
     const searches = useSel(x => x.searches)
-
+    const [url, setUrl] = useState<string | null>(null)
     const [previousTime, setPreviousTime] = useState<number>(new Date().getTime())
     const timeRef = useRef(previousTime);
     timeRef.current = previousTime;
@@ -33,7 +34,7 @@ const Challenge: React.FC<{}> = () => {
             <div className="bg-primary-100 w-full h-full mx-auto content-center 	">
                 <h1 className="text-center text-3xl">Challenge Your Friends</h1>
                 <div className="w-full mx-auto mt-3xl justify-center place-items-center ">
-                    <div className="mx-auto flex justify-center items-center">Type the name of a person</div>
+                    <div className="mx-auto flex justify-center items-center">Type the name of a person, and you can challenge your friends to a custom game of Historcle.</div>
                     <input
                         onKeyUp={oninput}
 
@@ -42,8 +43,17 @@ const Challenge: React.FC<{}> = () => {
                     />
                 </div>
             </div>
+            {url && <div>{base + `?person=${btoa(url)}`}</div>}
+            <ShowError />
+            {searches.map(s => <div className="bg-primary-200 flex flex-row rounded cursor-pointer hover:bg-primary-300 my-sm" onClick={() => setUrl(s.person)}>
+                <div className="w-5xl h-full">
+                    {s.image && <img height="100" width="100" src={s.image} />}
+                </div>
+                <div className="flex flex-col px-lg">
+                    <h1 className="text-lg font-bold">{s.name}</h1>
+                </div>
+            </div>)}
         </div>
-        {JSON.stringify(searches)}
     </div>
 }
 export default Challenge;
