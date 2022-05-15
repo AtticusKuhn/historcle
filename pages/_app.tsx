@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import React from 'react'
 import { Provider } from 'react-redux'
+import Startup from '../components/Startup'
 import { store } from '../redux'
 // import { useStore } from '../redux'
 // import { Provider } from 'react-redux'
@@ -28,7 +29,9 @@ export default function MyApp({ Component, pageProps }) {
             <link href="style.css" rel="stylesheet" type="text/css" />
         </Head>
         <Provider store={store}>
-            <Component {...pageProps} />
+            <Startup>
+                <Component {...pageProps} />
+            </Startup>
         </Provider>
     </>
 }

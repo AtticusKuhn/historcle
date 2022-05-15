@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import Footer from "../components/Footer";
 import Guesses from "../components/Guesses";
 import Input from "../components/Input";
 import Rules from "../components/Rules";
@@ -10,30 +11,7 @@ import { InitialState, setDay, setPerson, setState } from "../redux";
 
 
 const IndexPage = () => {
-    const disp = useDispatch();
-    // const router = useRouter()
-    useEffect(() => {
 
-        const query = new URLSearchParams(window.location.search)
-        const day = query.get("day")
-        console.log("day", day)
-        const person = query.get("person")
-        if (day) {
-            disp(setDay(Number(day)))
-        }
-        if (person && typeof person === "string") {
-            disp(setPerson(atob(person)))
-        }
-        const storage: InitialState = JSON.parse(localStorage.getItem("reduxState"))
-
-        if (storage) {
-            storage.default = false;
-            disp(setState(storage))
-        } else {
-            disp(setState(null))
-        }
-
-    }, [])
     return <>
 
         <div className="bg-primary-100 w-full h-full min-h-screen">
@@ -46,6 +24,7 @@ const IndexPage = () => {
                     <Suggestions />
                 </div>
                 <WonModal />
+                <Footer />
             </div>
         </div>
     </>

@@ -1,6 +1,6 @@
 import { AnyAction, configureStore, createAsyncThunk, createSlice, Dispatch, MiddlewareAPI, PayloadAction } from '@reduxjs/toolkit'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { getSuggestions, matches, request } from './dbpedia'
+import { getSuggestions, makeSearch, matches, request } from './dbpedia'
 import { people } from "./people"
 // import { useRouter } from 'next/router'
 // const router = useRouter()
@@ -24,6 +24,11 @@ export type suggestion = {
     image?: string,
     description: string,
 }
+export type search = {
+    name: string,
+    image?: string,
+    person: string,
+}
 export type InitialState = {
     guesses: guess[],
     waiting: boolean,
@@ -34,7 +39,8 @@ export type InitialState = {
     error: string | null,
     currentGuess: string,
     default?: boolean,
-    suggestions: suggestion[]
+    suggestions: suggestion[],
+    searches: search[],
 }
 
 const startDate = new Date(`May 2 2022`)
@@ -96,7 +102,8 @@ export const initialState: InitialState = {
     error: null,
     currentGuess: "",
     default: true,
-    suggestions: []
+    suggestions: [],
+    searches: []
 };
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
@@ -131,6 +138,13 @@ export const asyncSuggestions = createAsyncThunk(
         return response
     }
 )
+export const asyncSearch = createAsyncThunk(
+    'state/search',
+    async (person: string, config) => {
+        const response = await makeSearch(person)
+        return response
+    }
+)
 
 
 export const slice = createSlice({
@@ -147,6 +161,14 @@ export const slice = createSlice({
             console.log("set day")
             state.day = day.payload
             state.secretPerson = people[day.payload % people.length]
+            state.currentGuess = ""
+            state.default = true
+            state.error = null
+            state.guesses = []
+            state.modalOpen = false
+            state.suggestions = []
+            state.waiting = false
+            state.won = false
         },
         dismissError: (state) => {
             state.error = null;
@@ -212,6 +234,18 @@ export const slice = createSlice({
                 // state.waiting = false
                 console.log(action)
                 state.error = `wikipedia error?`
+            })
+            .addCase(asyncSearch.pending, (state) => {
+                // state.waiting = true
+            })
+            .addCase(asyncSearch.fulfilled, (state, action) => {
+                // state.waiting = false
+                state.searches = action.payload;
+            })
+            .addCase(asyncSearch.rejected, (state, action) => {
+                // state.waiting = false
+                console.log(action)
+                state.error = `searching error?`
             })
     },
 })

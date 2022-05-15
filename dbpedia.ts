@@ -1,4 +1,4 @@
-import { suggestion } from "./redux"
+import { search, suggestion } from "./redux"
 
 let reqs: number = 2
 const keys: string[] = ["birthdiff", "dist"]
@@ -224,4 +224,26 @@ export const getSuggestions = async (query: string): Promise<suggestion[]> => {
         image: page?.thumbnail?.source
     }))
     return result;
+}
+const searchQuery = (person: string) => `
+SELECT DISTINCT ?name ?image ?person WHERE { 
+    ?person rdfs:label ?label .
+    ?label bif:contains "${person}" .
+    ?person dbo:birthDate|dbp:birthDate ?birth .
+    ?person dbo:birthPlace|dbp:birthPlace ?place .
+    ?place <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point . 
+  OPTIONAL { #12345
+      ?person <http://dbpedia.org/ontology/thumbnail> ?image.
+  
+  }
+    FILTER(langMatches(lang(?label),"en"))
+  
+  }
+  LIMIT 10
+`;
+export const makeSearch = async (person: string): Promise<search[]> => {
+    const url = searchQuery(person);
+    const req = await fetch(makeUrl(url));
+    const json = await req.json();
+    return json.results.bindings as search[];
 }
