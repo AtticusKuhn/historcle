@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useState, useRef } from "react";
 import ShowError from "../components/Error";
 import { asyncSearch, asyncSuggestions, setCurrentGuess, useDisp, useSel } from "../redux";
@@ -43,9 +44,16 @@ const Challenge: React.FC<{}> = () => {
                     />
                 </div>
             </div>
-            {url && <div>{base + `?person=${btoa(url)}`}</div>}
+            {url && <div>
+                <div>Send your friends this url!</div>
+                <Link href={base + `?person=${btoa(url)}`} target="_blank">
+                    <a target="_blank">
+                        {base + `?person=${btoa(url)}`}
+                    </a>
+                </Link>
+            </div>}
             <ShowError />
-            {searches.map(s => <div className="bg-primary-200 flex flex-row rounded cursor-pointer hover:bg-primary-300 my-sm" onClick={() => setUrl(s.person)}>
+            {searches.map((s, i) => <div key={i} className="bg-primary-200 flex flex-row rounded cursor-pointer hover:bg-primary-300 my-sm" onClick={() => setUrl(s.person)}>
                 <div className="w-5xl h-full">
                     {s.image && <img height="100" width="100" src={s.image} />}
                 </div>
@@ -53,6 +61,7 @@ const Challenge: React.FC<{}> = () => {
                     <h1 className="text-lg font-bold">{s.name}</h1>
                 </div>
             </div>)}
+            {searches.length === 0 && <div>No results</div>}
         </div>
     </div>
 }

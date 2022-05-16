@@ -14,6 +14,7 @@ const Startup: React.FC<{}> = ({ children }) => {
             disp(setDay(Number(day)))
         }
         if (person && typeof person === "string") {
+            console.log(`setting person`)
             disp(setPerson(atob(person)))
         }
         const storage: InitialState = JSON.parse(localStorage.getItem("reduxState"))

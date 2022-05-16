@@ -155,14 +155,36 @@ export const slice = createSlice({
             state.modalOpen = false;
         },
         setPerson: (state, person: PayloadAction<string>) => {
-            state.secretPerson = person.payload
+            if (state.secretPerson !== person.payload) {
+                state.secretPerson = person.payload
+                state.currentGuess = ""
+                // state.default = true
+                state.error = null
+                state.guesses = []
+                state.modalOpen = false
+                state.suggestions = []
+                state.waiting = false
+                state.won = false
+            }
         },
         setDay: (state, day: PayloadAction<number>) => {
             console.log("set day")
-            state.day = day.payload
-            state.secretPerson = people[day.payload % people.length]
+            if (state.day !== day.payload) {
+                state.day = day.payload
+                state.secretPerson = people[day.payload % people.length]
+                state.currentGuess = ""
+                // state.default = true
+                state.error = null
+                state.guesses = []
+                state.modalOpen = false
+                state.suggestions = []
+                state.waiting = false
+                state.won = false
+            }
+        },
+        reset: (state) => {
             state.currentGuess = ""
-            state.default = true
+            // state.default = true
             state.error = null
             state.guesses = []
             state.modalOpen = false
@@ -256,7 +278,7 @@ export const slice = createSlice({
 // }
 
 // const persistedReducer = persistReducer(persistConfig, slice.reducer)
-export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ } = slice.actions
+export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ reset } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value

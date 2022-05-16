@@ -228,7 +228,7 @@ export const getSuggestions = async (query: string): Promise<suggestion[]> => {
 const searchQuery = (person: string) => `
 SELECT DISTINCT ?name ?image ?person WHERE { 
     ?person rdfs:label ?name .
-    ?name bif:contains "${person}" .
+    ?name bif:contains "'${person}'" .
     ?person dbo:birthDate|dbp:birthDate ?birth .
     ?person dbo:birthPlace|dbp:birthPlace ?place .
     ?place <http://www.w3.org/2003/01/geo/wgs84_pos#geometry> ?point . 

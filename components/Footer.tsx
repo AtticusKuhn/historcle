@@ -1,24 +1,25 @@
 import Link from "next/link"
 import React from "react"
+import { reset, useDisp } from "../redux"
+const base = process.env.NODE_ENV === "development" ? "/" : "/historcle/"
 
+const FooterLink: React.FC<{ link: string }> = ({ children, link }) => <Link href={base + link}>
+    <a className="my-auto text-secondary text-secondary" >
+        {children}
+    </a>
+</Link>
 const Footer: React.FC<{}> = () => {
-    const base = process.env.NODE_ENV === "development" ? "/" : "/historcle/"
-    return <div className="bg-primary-300 w-full p-lg flex place-content-around text-secondary rounded">
-        <Link href={base}>
-            <a>
-                Play
-            </a>
-        </Link>
-        <Link href={base + "explore"}>
-            <a>
-                Play  Previous
-            </a>
-        </Link>
-        <Link href={base + "challenge"}>
-            <a>
-                Challenge Your Friends
-            </a>
-        </Link>
+    const disp = useDisp()
+    return <div className="bg-primary-300 w-full p-lg flex place-content-around  rounded">
+        <button
+            className="bg-accent p-sm rounded"
+            onClick={() => disp(reset())}
+        >
+            Reset game
+        </button>
+        <FooterLink link="">Play</FooterLink>
+        <FooterLink link="explore">Play Previous</FooterLink>
+        <FooterLink link="challenge">Challenge Your Friends</FooterLink>
     </div>
 }
 export default Footer;
