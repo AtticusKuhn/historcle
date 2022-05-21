@@ -41,6 +41,7 @@ export type InitialState = {
     default?: boolean,
     suggestions: suggestion[],
     searches: search[],
+    selectedSearch: number | null,
 }
 
 const startDate = new Date(`May 2 2022`)
@@ -103,7 +104,8 @@ export const initialState: InitialState = {
     currentGuess: "",
     default: true,
     suggestions: [],
-    searches: []
+    searches: [],
+    selectedSearch: null,
 };
 export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
@@ -146,6 +148,21 @@ export const asyncSearch = createAsyncThunk(
     async (person: string, config) => {
         const response = await makeSearch(person)
         return response
+    }
+)
+export const enterGuess = createAsyncThunk(
+    'state/enterGuess',
+    async (_a, config) => {
+        const s = (config.getState()) as InitialState;
+        if (s.selectedSearch) {
+            if (s.selectedSearch <= s.suggestions.length) {
+                config.dispatch(asyncGuess(s.suggestions[s.selectedSearch].name))
+            }
+        } else {
+            if (s.suggestions.length > 0) {
+                config.dispatch(asyncGuess(s.suggestions[0].name))
+            }
+        }
     }
 )
 
@@ -194,6 +211,7 @@ export const slice = createSlice({
             state.suggestions = []
             state.waiting = false
             state.won = false
+            state.selectedSearch = null;
         },
         dismissError: (state) => {
             state.error = null;
@@ -213,9 +231,32 @@ export const slice = createSlice({
                 // state.waiting = newState.payload.waiting
                 state.won = newState.payload.won
                 state.suggestions = newState.payload.suggestions
+                state.selectedSearch = newState.payload.selectedSearch
             }
             state.default = false;
 
+        },
+        downSelect: (state) => {
+            if (state.suggestions.length === 0) {
+                state.selectedSearch = null
+            } else if (state.selectedSearch === null) {
+                state.selectedSearch = 0
+            } else {
+                state.selectedSearch = (state.selectedSearch + 1) % state.suggestions.length
+            }
+        },
+        upSelect: (state) => {
+            if (state.suggestions.length === 0) {
+                state.selectedSearch = null
+            } else if (state.selectedSearch === null) {
+                state.selectedSearch = 0
+            } else {
+                if (state.selectedSearch === 0) {
+                    state.selectedSearch = state.suggestions.length - 1
+                } else {
+                    state.selectedSearch -= 1
+                }
+            }
         },
         // setDefault: (state) => {
         //     state.default = false;
@@ -255,11 +296,12 @@ export const slice = createSlice({
             .addCase(asyncSuggestions.fulfilled, (state, action) => {
                 // state.waiting = false
                 state.suggestions = action.payload;
+                state.selectedSearch = null;
             })
             .addCase(asyncSuggestions.rejected, (state, action) => {
                 // state.waiting = false
                 console.log(action)
-                state.error = `wikipedia error?`
+                state.error = `wikipedia error`
             })
             .addCase(asyncSearch.pending, (state) => {
                 // state.waiting = true
@@ -271,7 +313,7 @@ export const slice = createSlice({
             .addCase(asyncSearch.rejected, (state, action) => {
                 // state.waiting = false
                 console.log(action)
-                state.error = `searching error?`
+                state.error = `searching error`
             })
     },
 })
@@ -282,7 +324,7 @@ export const slice = createSlice({
 // }
 
 // const persistedReducer = persistReducer(persistConfig, slice.reducer)
-export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ reset } = slice.actions
+export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ reset, downSelect, upSelect } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value

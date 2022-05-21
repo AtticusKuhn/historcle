@@ -216,7 +216,7 @@ export const getSuggestions = async (query: string): Promise<suggestion[]> => {
     const text = await req.text()
     const body = text.match(/\{.*\}/)[0]
     const json = JSON.parse(body)
-    const pages = json.query.pages;
+    const pages = json?.query?.pages || [];
     console.log("pages", pages)
     const result: suggestion[] = Object.values(pages).map((page: any) => ({
         description: page.description,
