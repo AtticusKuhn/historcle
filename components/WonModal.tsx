@@ -29,7 +29,7 @@ const WonModal: React.FC<{}> = () => {
                         The person was <a className="text-secondary p-tiny rounded" href={person}>{fmt(person).replace(/_/g, " ")}</a>
                     </p>
                     <div className="font-bold">your results:</div>
-                    <div>Historcle day {day}. Beat in {guesses.length} guesses</div>
+                    <div>Historcle day {day}. Beat in {guesses.length + 1} guesses</div>
                     <table>
                         <thead >
                             <tr>
@@ -37,7 +37,6 @@ const WonModal: React.FC<{}> = () => {
                                 <th>bd</th>
                                 <th>bp</th>
                                 <th>h</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,6 +47,12 @@ const WonModal: React.FC<{}> = () => {
                                 <td>{guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}</td>
 
                             </tr>)}
+                            <tr>
+                                <td>{guesses.length + 1}</td>
+                                <td>🟦</td>
+                                <td>🟦</td>
+                                <td>🟦</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -55,7 +60,9 @@ const WonModal: React.FC<{}> = () => {
                     <button onClick={() => {
                         navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length} guesses\n`
                             + guesses.map((guess, index) => `${index + 1}  ${guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}  ${guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"} ${guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}`)
-                                .join("\n") + "\n play it at: https://atticuskuhn.github.io/historcle/");
+                                .join("\n")
+                            + `\n${guesses.length + 1} 🟦 🟦 🟦`
+                            + "\n play it at: https://atticuskuhn.github.io/historcle/");
                     }} className="text-white bg-accent hover:bg-accent-hover rounded p-sm">
                         Copy results
                     </button>
