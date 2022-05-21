@@ -25,9 +25,8 @@ const Rules: React.FC<{}> = () => {
             how many years apart the two figures were born, and how far away they were born.
         </p>
         <p>
-            Please note that as I am pulling these figures from <a className="text-secondary" href="https://en.wikipedia.org/">Wikipedia</a>,you must be
-            precise
-            in your spelling
+            I know the birth dates and birth places of most people, but for people whose birth date
+            or place is unknown, you cannot guess them (think like Charlemange).
         </p>
         <div> Today is day {day}. Next day begins in {time} </div>
     </div>

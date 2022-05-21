@@ -10,7 +10,7 @@ const FooterLink: React.FC<{ link: string }> = ({ children, link }) => <Link hre
 </Link>
 const Footer: React.FC<{}> = () => {
     const disp = useDisp()
-    return <div className="bg-primary-300 w-full p-lg flex place-content-around  rounded">
+    return <div className="bg-primary-300 w-full p-sm flex place-content-around  rounded">
         <button
             className="bg-accent p-sm rounded"
             onClick={() => disp(reset())}

@@ -166,7 +166,7 @@ type res = {
     image: string,
 }
 export const request = async (guess: string, secretPerson: string): Promise<res> => {
-    const results = await Promise.all(new Array(5).fill(null).map(async (_e, i) => {
+    const results = await Promise.all(new Array(1).fill(null).map(async (_e, i) => {
         const url = makeUrl(makeQuery(guess, secretPerson));
         const req = await fetch(url, {
             "headers": {

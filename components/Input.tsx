@@ -9,14 +9,14 @@ const Input: React.FC<{}> = () => {
     const [previousTime, setPreviousTime] = useState<number>(new Date().getTime())
     const timeRef = useRef(previousTime);
     timeRef.current = previousTime;
-    const threshold = 3e3
+    const threshold = 500
     const canReq = (): boolean => new Date().getTime() - timeRef.current > threshold
     const dispatch = useDisp()
     const oninput = async (key: React.KeyboardEvent<HTMLInputElement>) => {
         const t = (key.target as HTMLInputElement);
 
         dispatch(setCurrentGuess(t.value))
-        if (t.value !== "" && (canReq())) {
+        if ((canReq())) {
             setPreviousTime(new Date().getTime())
             dispatch(asyncSuggestions())
         } else {

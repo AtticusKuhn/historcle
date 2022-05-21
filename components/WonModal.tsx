@@ -33,16 +33,16 @@ const WonModal: React.FC<{}> = () => {
                     <table>
                         <thead >
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
+                                <th>g</th>
+                                <th>bd</th>
+                                <th>bp</th>
+                                <th>h</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {guesses.map((guess, index) => <tr key={index} >
-                                <td>{index}</td>
+                                <td>{index + 1}</td>
                                 <td>{guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}</td>
                                 <td>{guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"}</td>
                                 <td>{guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}</td>
@@ -53,9 +53,9 @@ const WonModal: React.FC<{}> = () => {
                 </div>
                 <div className="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
                     <button onClick={() => {
-                        navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length} guesses` + guesses.map((guess, index) => `
-                        ${index + 1}  ${guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}  ${guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"} ${guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}
-                    `).join("\n") + "\n https://atticuskuhn.github.io/historcle/");
+                        navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length} guesses\n`
+                            + guesses.map((guess, index) => `${index + 1}  ${guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}  ${guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"} ${guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}`)
+                                .join("\n") + "\n play it at: https://atticuskuhn.github.io/historcle/");
                     }} className="text-white bg-accent hover:bg-accent-hover rounded p-sm">
                         Copy results
                     </button>

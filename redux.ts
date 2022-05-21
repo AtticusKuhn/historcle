@@ -134,6 +134,9 @@ export const asyncSuggestions = createAsyncThunk(
     'state/suggestions',
     async (_a, config) => {
         const state = (config.getState() as InitialState)
+        if (state.currentGuess === "") {
+            return [];
+        }
         const response = await getSuggestions(state.currentGuess)
         return response
     }
@@ -231,6 +234,7 @@ export const slice = createSlice({
                 }
             })
             .addCase(asyncGuess.rejected, (state, action) => {
+                // action.payload
                 state.waiting = false
                 state.error = `Cannot find person: ${state.currentGuess}`
             })
