@@ -116,6 +116,9 @@ export const asyncGuess = createAsyncThunk(
             secretPerson: state.secretPerson
         }))
         console.log("a", a)
+        if (state.won) {
+            return undefined;
+        }
         if (!a.payload/*!(config.getState() as InitialState).won*/) {
             const response = await request(guess, state.secretPerson)
 
@@ -237,6 +240,9 @@ export const slice = createSlice({
 
         },
         downSelect: (state) => {
+            if (state.won) {
+                return
+            }
             if (state.suggestions.length === 0) {
                 state.selectedSearch = null
             } else if (state.selectedSearch === null) {
@@ -246,6 +252,9 @@ export const slice = createSlice({
             }
         },
         upSelect: (state) => {
+            if (state.won) {
+                return
+            }
             if (state.suggestions.length === 0) {
                 state.selectedSearch = null
             } else if (state.selectedSearch === null) {

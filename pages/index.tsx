@@ -15,7 +15,7 @@ const IndexPage = () => {
     return <>
 
         <div className="bg-primary-100 w-full h-full min-h-screen">
-            <div className="sm:w-7/12 w-10/12 mx-auto">
+            <div className="sm:w-7/12 w-12/12 mx-auto">
                 <h1 className="font-bold text-4xl mx-auto p-lg text-center">Historcle</h1>
                 <Rules />
                 <Guesses />

@@ -17,6 +17,9 @@ const Input: React.FC<{}> = () => {
         const t = (key.target as HTMLInputElement);
         dispatch(setCurrentGuess(t.value))
         console.log(key.key, "key.key")
+        if (won || waiting) {
+            return;
+        }
         if (key.key === "Enter") {
             console.log("enter")
             dispatch(enterGuess())

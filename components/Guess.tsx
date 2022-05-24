@@ -3,7 +3,7 @@ import { fmt } from "../utils"
 
 const Guess: React.FC<{ index: number, guess: guess }> = ({ index, guess }) => (<>
     <tr key={index} className="even:bg-primary-100 odd:bg-primary-200 rounded">
-        <td>{index + 1}</td>
+        <td className="text-lg font-bold"><div className="text-center">{index + 1}</div></td>
         <td><img width="100" height="100" src={guess.image} /></td>
         <td>{guess.dist === null ? "[a bug occured]" : guess.dist}</td>
         <td>{Math.abs(guess.time)}</td>

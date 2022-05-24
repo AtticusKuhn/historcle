@@ -58,7 +58,7 @@ const WonModal: React.FC<{}> = () => {
                 </div>
                 <div className="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
                     <button onClick={() => {
-                        navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length} guesses\n`
+                        navigator.clipboard.writeText(`Historcle day ${day}. Beat in ${guesses.length + 1} guesses\n`
                             + guesses.map((guess, index) => `${index + 1}  ${guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}  ${guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"} ${guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}`)
                                 .join("\n")
                             + `\n${guesses.length + 1} 🟦 🟦 🟦`
