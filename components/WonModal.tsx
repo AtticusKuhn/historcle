@@ -6,6 +6,8 @@ const WonModal: React.FC<{}> = () => {
     const person = useSel(x => x.secretPerson);
     const guesses = useSel(x => x.guesses);
     const day = useSel(x => x.day);
+    if(!open)
+        return <></>
 
     return <div id="defaultModal" aria-hidden="true" className={`${!open && "hidden"} bg-primary-100 translate-x-1/4 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full`}>
         <div className="relative p-4 w-full max-w-2xl h-full md:h-auto">

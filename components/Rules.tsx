@@ -21,7 +21,7 @@ const Rules: React.FC<{}> = () => {
 
     return <div className="text-center  pb-3xl">
         <p>
-            I have thought of a secret historical figure. Can you guess him? For each guess I will tell you
+            I have thought of a secret historical figure. Can you guess him/her? For each guess I will tell you
             how many years apart the two figures were born, and how far away they were born.
         </p>
         <p>

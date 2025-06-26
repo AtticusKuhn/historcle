@@ -20,6 +20,12 @@ const Footer: React.FC<{}> = () => {
         <FooterLink link="">Play</FooterLink>
         <FooterLink link="explore">Play Previous</FooterLink>
         <FooterLink link="challenge">Challenge Your Friends</FooterLink>
+        <Link href="https://github.com/AtticusKuhn/historcle/tree/master">
+            <a className="my-auto text-secondary text-secondary" >
+                See the Code
+            </a>
+        </Link>
+
     </div>
 }
 export default Footer;

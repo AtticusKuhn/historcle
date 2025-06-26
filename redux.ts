@@ -1,6 +1,6 @@
 import { AnyAction, configureStore, createAsyncThunk, createSlice, Dispatch, MiddlewareAPI, PayloadAction } from '@reduxjs/toolkit'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { getSuggestions, makeSearch, matches, request } from './dbpedia'
+import { getSuggestions, makeSearch, matches, request, requestBirthDiff, requestDistance, requestHints, requestPhoto, resolveId } from './dbpedia'
 import { people } from "./people"
 // import { useRouter } from 'next/router'
 // const router = useRouter()
@@ -13,13 +13,14 @@ export const useSel: TypedUseSelectorHook<RootState> = useSelector
 
 
 export type guess = {
-    name: string,
-    dist: number,
-    time: number,
-    hints: string[],
-    image: string,
+    guessID: string,
+    dist?: number,
+    time?: number,
+    hints?: string[],
+    image?: string,
 }
 export type suggestion = {
+    pageid: string
     name: string,
     image?: string,
     description: string,
@@ -111,6 +112,7 @@ export const asyncGuess = createAsyncThunk(
     'state/fetchGuess',
     async (guess: string, config) => {
         const state = (config.getState() as InitialState)
+        console.log(`asyncGuess with guess = ${guess}`)
         const a = await config.dispatch(asyncMatches({
             guess: guess,
             secretPerson: state.secretPerson
@@ -120,11 +122,53 @@ export const asyncGuess = createAsyncThunk(
             return undefined;
         }
         if (!a.payload/*!(config.getState() as InitialState).won*/) {
-            const response = await request(guess, state.secretPerson)
+            // const response = await request(guess, state.secretPerson)
+            //
+            const guessID : string = await resolveId(Number(guess));
+            // console.log(`asyncGuess returned response`, response)
+            config.dispatch(asyncFetchImage(guessID))
+            config.dispatch(asyncFetchBirthDiff({guessID, person: state.secretPerson}))
+            config.dispatch(asyncFetchDistance({guessID, person: state.secretPerson}))
+            config.dispatch(asyncFetchHints({guessID, person: state.secretPerson}))
 
             // The value we return becomes the `fulfilled` action payload
-            return response
-        }
+            // return response
+            const g : guess = {guessID};
+            return g;
+        }}
+)
+export const asyncFetchImage = createAsyncThunk<{guessID:string, image:string}, string>(
+    'state/fetchImage',
+    async (guessID: string, config) => {
+        const image : string = await requestPhoto(guessID);
+        return {guessID, image}
+    }
+);
+export const asyncFetchBirthDiff = createAsyncThunk(
+    'state/fetchBirthDiff',
+    async (payload: {guessID : string, person:string}, config) => {
+        const {guessID, person} = payload;
+        const diff : number = await requestBirthDiff(guessID, secretPerson);
+        console.log(`asyncFetchBirthDiff got diff ${diff}`)
+        return {guessID, diff}
+    }
+);
+export const asyncFetchDistance = createAsyncThunk(
+    'state/fetchDistance',
+    async (payload: {guessID : string, person:string}, config) => {
+        const {guessID, person} = payload;
+        const dist : number = await requestDistance(guessID, secretPerson);
+        return {guessID, dist}
+    }
+)
+
+export const asyncFetchHints = createAsyncThunk(
+    'state/fetchHints',
+    async (payload: {guessID : string, person:string}, config) => {
+        const {guessID, person} = payload;
+        const hints : string[] = await requestHints(guessID, secretPerson);
+        console.log(`hints`, hints)
+        return {guessID, hints}
     }
 )
 export const asyncMatches = createAsyncThunk(
@@ -157,13 +201,14 @@ export const enterGuess = createAsyncThunk(
     'state/enterGuess',
     async (_a, config) => {
         const s = (config.getState()) as InitialState;
+        console.log(`suggestions is`, s.suggestions)
         if (s.selectedSearch) {
             if (s.selectedSearch <= s.suggestions.length) {
-                config.dispatch(asyncGuess(s.suggestions[s.selectedSearch].name))
+                config.dispatch(asyncGuess(s.suggestions[s.selectedSearch].pageid))
             }
         } else {
             if (s.suggestions.length > 0) {
-                config.dispatch(asyncGuess(s.suggestions[0].name))
+                config.dispatch(asyncGuess(s.suggestions[0].pageid))
             }
         }
     }
@@ -273,9 +318,26 @@ export const slice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(asyncFetchImage.fulfilled, (state, action) => {
+                const guess = state.guesses.find(g => g.guessID === action.payload.guessID);
+                guess.image = action.payload.image;
+            })
+            .addCase(asyncFetchBirthDiff.fulfilled, (state, action) => {
+                const guess = state.guesses.find(g => g.guessID === action.payload.guessID);
+                guess.time = action.payload.diff;
+            })
+            .addCase(asyncFetchDistance.fulfilled, (state, action) => {
+                const guess = state.guesses.find(g => g.guessID === action.payload.guessID);
+                guess.dist = action.payload.dist;
+            })
+            .addCase(asyncFetchHints.fulfilled, (state, action) => {
+                const guess = state.guesses.find(g => g.guessID === action.payload.guessID);
+                guess.hints = action.payload.hints;
+            })
             .addCase(asyncGuess.pending, (state) => {
                 state.waiting = true
             })
+        
 
             .addCase(asyncGuess.fulfilled, (state, action) => {
                 state.waiting = false
@@ -286,6 +348,7 @@ export const slice = createSlice({
             .addCase(asyncGuess.rejected, (state, action) => {
                 // action.payload
                 state.waiting = false
+                console.log(`rejected`, state, action)
                 state.error = `Cannot find person: ${state.currentGuess}`
             })
             .addCase(asyncMatches.pending, (state) => {
@@ -354,9 +417,9 @@ export const makeStore = () => configureStore({
 });
 export const store = makeStore()
 store.subscribe(() => {
-    console.log(store.getState())
+    // console.log(store.getState())
     if (!store.getState().default) {
-        console.log("setting")
+        // console.log("setting")
         localStorage.setItem('reduxState', JSON.stringify(store.getState()))
     }
 
