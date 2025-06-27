@@ -1,5 +1,4 @@
-#!/bin/bash
-NODE_ENV=production 
+NODE_ENV=production
 sudo yarn run build
 sudo yarn run export
 touch dist/.nojekyll

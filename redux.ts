@@ -113,29 +113,31 @@ export const asyncGuess = createAsyncThunk(
     async (guess: string, config) => {
         const state = (config.getState() as InitialState)
         console.log(`asyncGuess with guess = ${guess}`)
-        const a = await config.dispatch(asyncMatches({
-            guess: guess,
-            secretPerson: state.secretPerson
-        }))
-        console.log("a", a)
-        if (state.won) {
-            return undefined;
-        }
-        if (!a.payload/*!(config.getState() as InitialState).won*/) {
+        // const a = await config.dispatch(asyncMatches({
+        //     guess: guess,
+        //     secretPerson: state.secretPerson
+        // }))
+        // console.log("a", a)
+        // if (state.won) {
+        //     return undefined;
+        // }
+        // if (!a.payload/*!(config.getState() as InitialState).won*/) {
             // const response = await request(guess, state.secretPerson)
             //
-            const guessID : string = await resolveId(Number(guess));
-            // console.log(`asyncGuess returned response`, response)
-            config.dispatch(asyncFetchImage(guessID))
-            config.dispatch(asyncFetchBirthDiff({guessID, person: state.secretPerson}))
-            config.dispatch(asyncFetchDistance({guessID, person: state.secretPerson}))
-            config.dispatch(asyncFetchHints({guessID, person: state.secretPerson}))
+        const guessID : string = await resolveId(Number(guess));
+        config.dispatch(checkWon({guessID, person: state.secretPerson}))
+        // console.log(`asyncGuess returned response`, response)
+        config.dispatch(asyncFetchImage(guessID))
+        config.dispatch(asyncFetchBirthDiff({guessID, person: state.secretPerson}))
+        config.dispatch(asyncFetchDistance({guessID, person: state.secretPerson}))
+        config.dispatch(asyncFetchHints({guessID, person: state.secretPerson}))
 
-            // The value we return becomes the `fulfilled` action payload
-            // return response
-            const g : guess = {guessID};
-            return g;
-        }}
+        // The value we return becomes the `fulfilled` action payload
+        // return response
+        const g : guess = {guessID};
+        return g;
+        // }
+    }
 )
 export const asyncFetchImage = createAsyncThunk<{guessID:string, image:string}, string>(
     'state/fetchImage',
@@ -171,14 +173,14 @@ export const asyncFetchHints = createAsyncThunk(
         return {guessID, hints}
     }
 )
-export const asyncMatches = createAsyncThunk(
-    'state/matches',
-    async ({ guess, secretPerson }: { guess: string, secretPerson: string }) => {
-        const response = await matches(guess, secretPerson)
-        // The value we return becomes the `fulfilled` action payload
-        return response
-    }
-)
+// export const asyncMatches = createAsyncThunk(
+//     'state/matches',
+//     async ({ guess, secretPerson }: { guess: string, secretPerson: string }) => {
+//         const response = await matches(guess, secretPerson)
+//         // The value we return becomes the `fulfilled` action payload
+//         return response
+//     }
+// )
 export const asyncSuggestions = createAsyncThunk(
     'state/suggestions',
     async (_a, config) => {
@@ -219,6 +221,12 @@ export const slice = createSlice({
     name: 'state',
     initialState,
     reducers: {
+        checkWon: (state, action: PayloadAction<{ guessID: string, person: string }>) => {
+            if(action.payload.guessID === action.payload.person){
+                state.won = true
+                state.modalOpen = true
+            }
+        },
         closeModal: (state) => {
             state.modalOpen = false;
         },
@@ -351,17 +359,17 @@ export const slice = createSlice({
                 console.log(`rejected`, state, action)
                 state.error = `Cannot find person: ${state.currentGuess}`
             })
-            .addCase(asyncMatches.pending, (state) => {
-                state.waiting = true
-            })
-            .addCase(asyncMatches.fulfilled, (state, action) => {
-                if (action.payload) {
-                    state.won = true
-                    state.modalOpen = true
+            // .addCase(asyncMatches.pending, (state) => {
+            //     state.waiting = true
+            // })
+            // .addCase(asyncMatches.fulfilled, (state, action) => {
+            //     if (action.payload) {
+            //         state.won = true
+            //         state.modalOpen = true
 
-                }
-                // state.waiting = false;
-            })
+            //     }
+            //     // state.waiting = false;
+            // })
             .addCase(asyncSuggestions.pending, (state) => {
                 // state.waiting = true
             })
@@ -396,7 +404,7 @@ export const slice = createSlice({
 // }
 
 // const persistedReducer = persistReducer(persistConfig, slice.reducer)
-export const { closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ reset, downSelect, upSelect } = slice.actions
+export const { checkWon, closeModal, setDay, setPerson, dismissError, setCurrentGuess, setState, /*setDefault */ reset, downSelect, upSelect } = slice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 // export const selectCount = (state: RootState) => state.money.value

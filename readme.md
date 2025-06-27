@@ -13,4 +13,8 @@ Here is an example game.
 
 If you want to play, go to https://atticuskuhn.github.io/historcle/
 
-# Todos
+I welcome any contributions or pull requests.
+
+The data is gathered from DBPedia 
+https://www.dbpedia.org/
+using SPARQL.

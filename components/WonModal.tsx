@@ -46,7 +46,7 @@ const WonModal: React.FC<{}> = () => {
                                 <td>{index + 1}</td>
                                 <td>{guess.dist > 1000 ? "🟥" : guess.dist > 500 ? "🟨" : "🟩"}</td>
                                 <td>{guess.time > 300 ? "🟥" : guess.time > 100 ? "🟨" : "🟩"}</td>
-                                <td>{guess.hints.length < 3 ? "🟥" : guess.hints.length < 5 ? "🟨" : "🟩"}</td>
+                                <td>{(guess?.hints && guess.hints.length) < 3 ? "🟥" : (guess?.hints && guess.hints.length < 5) ? "🟨" : "🟩"}</td>
 
                             </tr>)}
                             <tr>
